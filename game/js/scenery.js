@@ -1,5 +1,5 @@
-// scenery.js — the sun-soaked look: sunset sky dome, warm directional sun with
-// shadows, ocean, beach, palm trees, street lamps and the El Faro lighthouse.
+// scenery.js — the sun-soaked look: sunset sky dome with a visible sun disc, warm
+// directional sun with tight shadows, ocean, beach, palms, lamps and El Faro.
 import * as THREE from '../vendor/three.module.min.js';
 import { CFG } from './config.js';
 import { range, chance } from './random.js';
@@ -15,19 +15,20 @@ varying vec3 vDir;
 uniform vec3 sunDir;
 void main() {
   float h = clamp(vDir.y, -0.05, 1.0);
-  vec3 zenith = vec3(0.16, 0.30, 0.58);
-  vec3 mid = vec3(0.99, 0.62, 0.36);
-  vec3 horizon = vec3(1.0, 0.85, 0.62);
-  vec3 col = mix(horizon, mid, smoothstep(0.0, 0.18, h));
-  col = mix(col, zenith, smoothstep(0.12, 0.65, h));
+  vec3 zenith = vec3(0.09, 0.20, 0.50);
+  vec3 mid = vec3(1.0, 0.52, 0.26);
+  vec3 horizon = vec3(1.0, 0.84, 0.58);
+  vec3 col = mix(horizon, mid, smoothstep(0.0, 0.16, h));
+  col = mix(col, zenith, smoothstep(0.10, 0.62, h));
   float s = max(dot(normalize(vDir), normalize(sunDir)), 0.0);
-  col += vec3(1.0, 0.75, 0.45) * pow(s, 90.0) * 1.4;
-  col += vec3(1.0, 0.6, 0.3) * pow(s, 8.0) * 0.22;
+  col += vec3(1.0, 0.92, 0.72) * pow(s, 420.0) * 2.6;  // the sun disc itself
+  col += vec3(1.0, 0.72, 0.40) * pow(s, 48.0) * 0.55;  // tight halo
+  col += vec3(1.0, 0.58, 0.28) * pow(s, 6.0) * 0.20;   // wide sunset glow
   gl_FragColor = vec4(col, 1.0);
 }`;
 
 export function buildScenery(scene, rng) {
-  const sunDir = new THREE.Vector3(-0.72, 0.28, 0.35).normalize();
+  const sunDir = new THREE.Vector3(-0.85, 0.24, 0.28).normalize();
 
   const sky = new THREE.Mesh(
     new THREE.SphereGeometry(1400, 24, 16),
@@ -38,16 +39,16 @@ export function buildScenery(scene, rng) {
     })
   );
   scene.add(sky);
-  scene.fog = new THREE.Fog(0xffc9a0, 220, 1050);
+  scene.fog = new THREE.Fog(0xffc9a0, 150, 780);
 
-  const hemi = new THREE.HemisphereLight(0xffd9b0, 0x44546a, 0.95);
+  const hemi = new THREE.HemisphereLight(0xffd9b0, 0x44546a, 1.05);
   scene.add(hemi);
-  const sun = new THREE.DirectionalLight(0xffd2a0, 2.7);
+  const sun = new THREE.DirectionalLight(0xffd2a0, 3.0);
   sun.position.copy(sunDir).multiplyScalar(300);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.left = -95; sun.shadow.camera.right = 95;
-  sun.shadow.camera.top = 95; sun.shadow.camera.bottom = -95;
+  sun.shadow.camera.left = -80; sun.shadow.camera.right = 80;
+  sun.shadow.camera.top = 80; sun.shadow.camera.bottom = -80;
   sun.shadow.camera.near = 50; sun.shadow.camera.far = 700;
   sun.shadow.bias = -0.0006;
   scene.add(sun); scene.add(sun.target);
@@ -79,7 +80,7 @@ export function buildScenery(scene, rng) {
 
   // Palm trees: instanced trunks + stylized frond crowns, on the beach and park.
   const spots = [];
-  for (let z = -270; z <= 270; z += 26) spots.push({ x: 300 + range(rng, -4, 10), z: z + range(rng, -6, 6) });
+  for (let z = -270; z <= 270; z += 26) spots.push({ x: 320 + range(rng, -4, 16), z: z + range(rng, -6, 6) });
   for (let k = 0; k < 10; k++) spots.push({ x: range(rng, -24, 24), z: 80 + range(rng, -24, 24) });
   for (let k = 0; k < 14; k++) spots.push({ x: range(rng, -260, 260), z: range(rng, -260, 260) });
   const trunkGeo = new THREE.CylinderGeometry(0.16, 0.26, 5.4, 6);

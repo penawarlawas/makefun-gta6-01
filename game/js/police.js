@@ -146,7 +146,11 @@ export class Police {
         while (diff < -Math.PI) diff += Math.PI * 2;
         let throttle = 1, steer = Math.max(-1, Math.min(1, diff * 2.6));
         if (dist < 9 && !p.inCar) throttle = 0.15;
-        if (G.shotMode && dist < 12) throttle = 0.05; // staged scenes hold formation
+        if (G.shotMode) {
+          // staged scenes: hold a staggered pursuit formation, lanes locked
+          steer = 0;
+          if (dist < (car.shotHold || 8)) throttle = 0.05;
+        }
         if (Math.abs(car.speed) < 1.2 && dist > 10) {
           car.stuckT += dt;
           if (car.stuckT > 1.6) { car.reverseT = 0.9; car.stuckT = 0; }
@@ -161,13 +165,18 @@ export class Police {
           if (this.stars >= 3) this.spawnOfficer(car.pos.x - 1.5, car.pos.z);
         }
       }
-      // flashing lightbar
+      // flashing lightbar and its additive glow
       const bar = car.mesh.userData.lightbar;
       if (bar) {
         const on = car.mode === 'chase';
         const phase = Math.floor(G.time * 6) % 2 === 0;
         bar[0].color.setHex(on && phase ? 0xff2222 : 0x551111);
         bar[1].color.setHex(on && !phase ? 0x2266ff : 0x112255);
+        const glow = car.mesh.userData.lightglow;
+        if (glow) {
+          glow[0].opacity = on && phase ? 0.75 : 0.04;
+          glow[1].opacity = on && !phase ? 0.75 : 0.04;
+        }
       }
     }
     G.audio.setSiren(this.stars > 0, sirenDist);

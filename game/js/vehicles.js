@@ -52,11 +52,27 @@ export function makeCarMesh(type, color) {
   if (type === 'police') {
     const hood = new THREE.Mesh(new THREE.BoxGeometry(s.wid * 0.98, 0.1, s.len * 0.3), new THREE.MeshLambertMaterial({ color: 0x14213d }));
     hood.position.set(0, 0.96, s.len * 0.3); g.add(hood);
-    const barR = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.3), new THREE.MeshBasicMaterial({ color: 0xff2222 }));
-    const barB = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.3), new THREE.MeshBasicMaterial({ color: 0x2266ff }));
-    barR.position.set(-0.3, 1.62, -s.len * 0.06); barB.position.set(0.3, 1.62, -s.len * 0.06);
+    const barR = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.22, 0.42), new THREE.MeshBasicMaterial({ color: 0xff2222 }));
+    const barB = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.22, 0.42), new THREE.MeshBasicMaterial({ color: 0x2266ff }));
+    barR.position.set(-0.32, 1.66, -s.len * 0.06); barB.position.set(0.32, 1.66, -s.len * 0.06);
     g.add(barR); g.add(barB);
     g.userData.lightbar = [barR.material, barB.material];
+    // crossed glow planes so the flash reads from any camera angle, even against the sunset
+    const glowMats = [];
+    for (const [gx, gc] of [[-0.32, 0xff3333], [0.32, 0x3377ff]]) {
+      const mat = new THREE.MeshBasicMaterial({
+        color: gc, transparent: true, opacity: 0,
+        depthWrite: false, side: THREE.DoubleSide,
+      });
+      for (const ry of [0, Math.PI / 2]) {
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 1.6), mat);
+        plane.position.set(gx, 2.05, -s.len * 0.06);
+        plane.rotation.y = ry;
+        g.add(plane);
+      }
+      glowMats.push(mat);
+    }
+    g.userData.lightglow = glowMats;
   }
   if (type === 'taxi') {
     const ts = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.24, 0.36), new THREE.MeshBasicMaterial({ color: 0xffe9b0 }));

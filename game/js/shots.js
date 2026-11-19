@@ -15,6 +15,7 @@ function putPlayerInCar(G, type, x, z, angle, color, speed) {
   G.player.inCar = car;
   G.player.mesh.visible = false;
   G.player.x = x; G.player.z = z;
+  G.player.mesh.position.set(x, 0, z); // shadow frustum follows from frame one
   return car;
 }
 
@@ -35,12 +36,13 @@ function putPedOnRing(G, idx, blockJ, z) {
   p.dir = 1; p.panic = 0; p.alive = true; p.fall = 0;
 }
 
-function chaseCarBehind(G, x, z, angle) {
+function chaseCarBehind(G, x, z, angle, hold, speed) {
   G.police.spawnChase();
   const car = G.police.cars[G.police.cars.length - 1];
   car.pos.set(x, 0, z);
   car.angle = angle; car.mesh.rotation.y = angle;
-  car.speed = 24;
+  car.speed = speed;
+  car.shotHold = hold;
   return car;
 }
 
@@ -52,24 +54,25 @@ export function stageShot(G, name) {
   G.police.clearWanted();
 
   if (name === 'chase') {
-    // cover: three-star pursuit down the coastal strip during the heist escape
+    // cover: side tracking shot from the beach — the Solara GT flees north with
+    // three SPD interceptors right on its bumper, sunset sun over the city
     putPlayerInCar(G, 'solara', 284, 60, Math.PI, 0xff6f61, 24);
     G.shotCruise = 24;
     G.missions.index = 3;
     G.missions.active = { def: G.missions.defs[3], step: 2, timer: 0 };
     G.missions.refreshObjective();
     G.police.heat = 112; G.police.stars = 3; G.police.sinceCrime = 0;
-    chaseCarBehind(G, 284, 84, Math.PI);
-    chaseCarBehind(G, 276, 100, Math.PI);
-    chaseCarBehind(G, 284, 118, Math.PI);
-    putTrafficNear(G, 30, 12, 1);
+    chaseCarBehind(G, 284, 68, Math.PI, 5, 27);   // nearly ramming
+    chaseCarBehind(G, 276, 74, Math.PI, 9, 28);   // overtaking in the left lane
+    chaseCarBehind(G, 284, 82, Math.PI, 14, 30);
+    putTrafficNear(G, -140, 12, -1);
     for (let k = 0; k < 5; k++) putPedOnRing(G, k, 4, 52 + k * 6);
-    // front tracking shot: the camera faces the car so the pursuing SPD is in frame
-    G.cam.yaw = 0; G.cam.pitch = 0.3;
-    G.cam.snapBehind(G.player.inCar.pos, 0);
+    G.cam.shotDist = 24;
+    G.cam.yaw = -Math.PI / 2 - 0.22; G.cam.pitch = 0.22;
+    G.cam.snapBehind(G.player.inCar.pos, G.cam.yaw);
   } else if (name === 'street') {
     // on foot on the beach boardwalk, lighthouse ahead, ocean to the right
-    G.player.respawn(312, -40);
+    G.player.respawn(330, -40);
     G.player.angle = Math.PI + 0.3;
     G.player.weapon = 0;
     G.missions.index = 0;
@@ -105,7 +108,7 @@ export function stageShot(G, name) {
     G.player.weapon = 1;
     G.player.angle = Math.PI / 2;
     G.police.heat = 55; G.police.stars = 2; G.police.sinceCrime = 0;
-    chaseCarBehind(G, 36, 280, -Math.PI / 2);
+    chaseCarBehind(G, 36, 280, -Math.PI / 2, 12, 20);
     G.police.spawnOfficer(2, 266);
     G.police.spawnOfficer(6, 288);
     G.cam.yaw = Math.PI / 2; G.cam.pitch = 0.24;

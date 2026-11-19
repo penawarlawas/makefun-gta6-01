@@ -8,6 +8,7 @@ export class ChaseCamera {
     this.yaw = Math.PI;
     this.pitch = 0.32;
     this.dist = 6.5;
+    this.shotDist = 0; // staged screenshot scenes can demand a wider framing
     this.current = new THREE.Vector3(0, 8, 12);
     this.look = new THREE.Vector3();
     this.sens = 0.0026;
@@ -18,7 +19,7 @@ export class ChaseCamera {
     this.pitch = Math.max(0.06, Math.min(1.25, this.pitch));
   }
   update(dt, target, inCar, speed01) {
-    const wantDist = inCar ? 9.5 + speed01 * 2.5 : 6.5;
+    const wantDist = this.shotDist || (inCar ? 9.5 + speed01 * 2.5 : 6.5);
     this.dist += (wantDist - this.dist) * Math.min(1, dt * 4);
     const height = inCar ? 2.4 : 1.7;
     const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
@@ -58,7 +59,9 @@ export class ChaseCamera {
   }
   snapBehind(target, angle) {
     this.yaw = angle;
-    this.current.set(target.x - Math.sin(angle) * this.dist, target.y + 4, target.z - Math.cos(angle) * this.dist);
+    const d = this.shotDist || this.dist;
+    this.dist = d;
+    this.current.set(target.x - Math.sin(angle) * d, target.y + 4, target.z - Math.cos(angle) * d);
     this.look.copy(target);
   }
 }

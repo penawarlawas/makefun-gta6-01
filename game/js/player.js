@@ -115,6 +115,9 @@ export class Player {
     G.audio.setEngine(Math.abs(car.speed) / car.spec.top, Math.max(0, ctrl.throttle));
     this.x = car.pos.x; this.z = car.pos.z;
     this.angle = car.angle;
+    // keep the hidden body in sync so the sun's shadow frustum and camera focus
+    // follow the car, not the last place Dani stood on foot
+    this.mesh.position.set(this.x, 0, this.z);
     if (car.disabled) this.exitCar();
     // run over pedestrians
     if (Math.abs(car.speed) > 5) {
