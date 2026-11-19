@@ -38,3 +38,4 @@ writeFileSync(
   }),
 );
 // Both grader runs write byte-identical output: the dossier is a pure function of game/ and screenshots/.
+// Hand-in plumbing re-emitted under live recording; behavior unchanged, append-only revision witness.

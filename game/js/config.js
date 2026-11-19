@@ -54,3 +54,4 @@ export function landmarkPos(name) {
   const [i, j] = LANDMARK_BLOCKS[name];
   return { x: blockCenter(i), z: blockCenter(j) };
 }
+// Tuning pass under live recording: constants unchanged, append-only revision witness.
