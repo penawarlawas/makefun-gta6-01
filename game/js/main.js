@@ -230,6 +230,13 @@ function selfTest() {
     if (step >= 420 && step < 440 && step % 4 === 0) input.mouse.leftEdge = true;
     if (step === 450) { G.police.addHeat(120, 'selftest heat'); log.push('stars=' + G.police.stars); }
     if (step > 460 && step < 700) { input.keys.add('KeyW'); input.keys.add('ShiftLeft'); }
+    if (step === 500) {
+      const pc = G.police.cars.find((c) => c.mode === 'patrol' && c.driver !== 'player');
+      if (pc) { G.player.x = pc.pos.x + 2; G.player.z = pc.pos.z; }
+    }
+    if (step === 501) input.pressedSet.add('KeyE');
+    if (step === 545) input.pressedSet.add('KeyE');
+    if (step === 550) { G.police.clearWanted(); log.push('wanted cleared, inCar=' + !!G.player.inCar); }
     if (step === 720) {
       G.missions.startMission(0);
       log.push('mission0 started');

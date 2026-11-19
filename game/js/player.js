@@ -143,7 +143,7 @@ export class Player {
     if (this.inCar) { this.exitCar(); return; }
     const car = this.nearestCar();
     if (!car) return;
-    if (car.ai) G.traffic.remove(car);
+    if (car.ai && G.traffic.cars.includes(car)) G.traffic.remove(car);
     const wasPolice = car.type === 'police';
     car.driver = 'player';
     this.inCar = car;
@@ -160,6 +160,12 @@ export class Player {
     if (!car) return;
     car.driver = null;
     car.speed *= 0.4;
+    // a stolen SPD cruiser stays where you leave it — it never rejoins a patrol
+    if (car.mode) {
+      const k = G.police.cars.indexOf(car);
+      if (k >= 0) G.police.cars.splice(k, 1);
+      car.mode = null; car.ai = null;
+    }
     this.inCar = null;
     const f = car.forward();
     const res = resolveCollisions(car.pos.x - f.z * 2.2, car.pos.z + f.x * 2.2, 0.5, G.city.colliders);
