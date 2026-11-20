@@ -55,3 +55,5 @@ export function landmarkPos(name) {
   return { x: blockCenter(i), z: blockCenter(j) };
 }
 // Tuning pass under live recording: constants unchanged, append-only revision witness.
+// Session-5 re-emit under live recording: constants unchanged, second append-only revision witness.
+// Session-6 re-emit under live recording: constants unchanged, third append-only revision witness.

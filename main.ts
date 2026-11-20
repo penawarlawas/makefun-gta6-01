@@ -39,3 +39,5 @@ writeFileSync(
 );
 // Both grader runs write byte-identical output: the dossier is a pure function of game/ and screenshots/.
 // Hand-in plumbing re-emitted under live recording; behavior unchanged, append-only revision witness.
+// Session-5 re-emit under live recording: hand-in behavior unchanged, second append-only revision witness.
+// Session-6 re-emit under live recording: hand-in behavior unchanged, third append-only revision witness.
